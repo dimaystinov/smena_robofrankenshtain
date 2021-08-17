@@ -11,9 +11,14 @@
 получаем 209 тиков на оборот колеса
 пины 32, 34 используеи для получения направления вращения
 
-Задача программы - контроль скорости (в тиках/сек)
+Принимает и исполняет JSON команды
+Примеры команд:
+{"type":"rotate","value":50}
+{"type":"move","value":-150}
 **********************************************************/ 
 #define MYDEBUG
+
+#define COMMAND_SERIAL Serial
 
 /*************************************************************************************************
  * JSON Command object
@@ -157,6 +162,10 @@ void onTaskBegin(){
 }
 
 void onTaskEnd(){
+  CommandJSON outCmd;
+  outCmd.setType('s');
+  outCmd.setValue(0);
+  COMMAND_SERIAL.println(outCmd.serializeJSON());
 }
 
 void startTask(int _ticks1, int _ticks2){
@@ -530,8 +539,6 @@ void trace(){
 /*************************************************************************************************
  * main loop
  */
-
-#define COMMAND_SERIAL Serial
 
 void setup() {
   setupEnc();
