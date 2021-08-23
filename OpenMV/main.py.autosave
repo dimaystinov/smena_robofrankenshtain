@@ -1,20 +1,14 @@
 import pyb
 from pyb import LED
 import sensor, image, time, math
-#from button_test import Button_Test
+from button_test import Button_Test
 import json
 from pyb import UART
-import json
-
 uart = UART(1, 9600)
 red_led = LED(1)
 green_led = LED(2)
 print("ready")
 green_led.on()
-
-coeff_tag0 = 100/17
-coeff_tag1 = 100/17
-gates_length = 1
 #запуск по кнопке
 
 #button = Button_Test()
@@ -79,48 +73,14 @@ class ball_and_Commands:
         img.draw_keypoints([(blob.cx(), blob.cy(), int(math.degrees(blob.rotation())))], size=5)
 
 def move(value):
-    message ="{\"type\":\"move\",\"value\":" + str(value * 10) + "} \n"
-    uart.write("{\"type\":\"move\",\"value\":" + str(0) + "} \n")
-    try:
-        arduino_json = uart.readline().decode()
-        if arduino_json != None:
-            # print(arduino_json)
-            json_data = json.loads(arduino_json)
-            arduino_status = json_data["value"]
-            if int(arduino_status) == -2:
-                # print(arduino_status)
-                time.sleep(50)
-
-            if int(arduino_status) == 0:
-                uart.write(message)
-
-                '''
-        else:
-            json_data = json.loads(arduino_json)
-'''
-    except:
-        # print('error arduino')
-        time.sleep(50)
-
-    # uart.write(message)
+    message ="{\"type\":\"move\",\"value\":" + str(value * 10 - 340) + "} \n"
+    arduino_status = uart.readline()
+    print(arduino_status)
+    uart.write(message)
 
 def rotate(value):
     message = "{\"type\":\"rotate\",\"value\":" + str(value) + "} \n"
-    uart.write("{\"type\":\"move\",\"value\":" + str(0) + "} \n")
-    try:
-        arduino_json = uart.readline().decode()
-        if arduino_json != None:
-            # print(arduino_json)
-            json_data = json.loads(arduino_json)
-            arduino_status = json_data["value"]
-            if int(arduino_status) == -2:
-                # print(arduino_status)
-                time.sleep(50)
-            if int(arduino_status) == 0:
-                uart.write(message)
-    except:
-        # print('error arduino')
-        time.sleep(50)
+    uart.write(message)
 
 def degrees(radians):
     return (180 * radians) / math.pi
@@ -151,28 +111,26 @@ flag1 = True
 flag2 = True
 flag3 = True
 
-move(10)
 while(True):
     clock.tick()
-    move(4)
+    move(10)
     '''
     img = sensor.snapshot()
-    time.sleep(100)
+    #time.sleep(100)
     for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
-        if blob.roundness() >  0.5:
-            ball = ball_and_Commands(blob)
-            ball.draw(blob, img)
+        #if blob.roundness() >  0.5:
+        ball = ball_and_Commands(blob)
+        ball.draw(blob, img)
         try:
             ball.distance()
-            ball.ang()
         except:
             print("math_error_distance")
-
+        ball.ang()
         #try:
         #    ball.counting()
         #except:
         #    print("math error2")
-        # print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
+        print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
         #time.sleep(100)
         if flag2:
             rotate(-(ball.angle))
@@ -186,35 +144,20 @@ while(True):
 
     try:
         red_led.off()
-        april_tags = img.find_apriltags(families=tag_families, fx=f_x, fy=f_y, cx=c_x, cy=c_y)
-        number_of_apriltags = len(april_tags)
-
-        for tag in april_tags:
+        for tag in img.find_apriltags(families=tag_families, fx=f_x, fy=f_y, cx=c_x, cy=c_y):
             img.draw_rectangle(tag.rect(), color = (255, 255, 0))
             img.draw_cross(tag.cx(), tag.cy(), color = (100, 0, 100))
             angle2 = -((tag.cx()-60)*30/60)
             print_args = (family_name(tag), tag.id(), (180 * tag.rotation()) / math.pi)
             print_args_2 = (tag.x_translation(), tag.y_translation(), tag.z_translation(), degrees(tag.x_rotation()), degrees(tag.y_rotation()), degrees(tag.z_rotation()))
-            # print("Tag Family %s, Tag ID %d, rotation %f (degrees)" % print_args)
+            print("Tag Family %s, Tag ID %d, rotation %f (degrees)" % print_args)
             print("Tx: %f, Ty %f, Tz %f, Rx %f, Ry %f, Rz %f" % print_args_2)
-            if  family_name(tag) == "TAG36H11" and int(tag.id()) == 0:
-                left_tag = {"id": int(tag.id()), "offset_right": int(-tag.x_translation() * coeff_tag0), "distance": abs(int(tag.z_translation() * coeff_tag0)), "angle":int(math.degrees(math.atan(int(-tag.x_translation() )/abs(int(tag.z_translation() )))))}
-                print(left_tag)
-            else:
-                left_tag = None
-            if  family_name(tag) == "TAG36H11" and int(tag.id()) == 1:
-                right_tag= {"id": int(tag.id()), "offset_right": int(-tag.x_translation() * coeff_tag0), "distance": abs(int(tag.z_translation() * coeff_tag0)), "angle":int(math.degrees(math.atan(int(-tag.x_translation() )/abs(int(tag.z_translation() )))))}
-                print(right_tag)
-            else:
-                right_tag = None
-
-            time.sleep(500)
-
     except:
         red_led.on()
         print("framesize_error")
     if flag3:
         rotate(-(angle2))
-        flag3 = False'''
-    # move(100)
+        flag3 = False
+    move(100)
 print("end")
+'''
