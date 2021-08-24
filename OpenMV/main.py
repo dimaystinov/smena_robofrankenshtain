@@ -74,6 +74,8 @@ class ball_and_Commands:
 
 def move(value):
     message ="{\"type\":\"move\",\"value\":" + str(value * 10 - 340) + "} \n"
+    arduino_status = uart.readline()
+    print(arduino_status)
     uart.write(message)
 
 def rotate(value):
@@ -111,6 +113,8 @@ flag3 = True
 
 while(True):
     clock.tick()
+    move(10)
+    '''
     img = sensor.snapshot()
     #time.sleep(100)
     for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
@@ -156,3 +160,4 @@ while(True):
         flag3 = False
     move(100)
 print("end")
+'''

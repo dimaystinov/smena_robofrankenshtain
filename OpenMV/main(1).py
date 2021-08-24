@@ -27,7 +27,7 @@ c_y = 120 * 0.5
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.HQVGA)
-print(sensor.HQVGA)
+# print(sensor.HQVGA)
 sensor.skip_frames(time = 2000)
 sensor.set_auto_gain(False)
 sensor.set_auto_whitebal(False)
@@ -137,7 +137,7 @@ while(True):
         #print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
         if flag1:
             rotate(-(ball.angle))
-            print(ball.angle)
+            print("angle: "ball.angle)
             flag1 = False
         if flag2:
             move(ball.length / 2)
@@ -185,11 +185,11 @@ print("ready")
 green_led.on()
 #запуск по кнопке
 
-'''button = Button_Test()
+button = Button_Test()
 pressed_button = button.wait_for_button_pressing()
 if pressed_button == 1:
     print ("go")
-'''
+
 #трешхолды на мяч (L Min, L Max, A Min, A Max, B Min, B Max)
 thresholds = [(31, 73, 37, 83, -11, 83)]
 f_x = (2.8 / 3.984) * 160

@@ -23,7 +23,7 @@ gates_length = 1
 #    print ("go")
 
 #трешхолды на мяч (L Min, L Max, A Min, A Max, B Min, B Max)
-thresholds = [(36, 73, 50, 89, -6, 69)]
+thresholds = [(36, 72, 57, 96, -6, 72)]
 f_x = (2.8 / 3.984) * 160 # find_apriltags defaults to this if not set
 f_y = (2.8 / 2.952) * 120 # find_apriltags defaults to this if not set
 c_x = 160 * 0.5 # find_apriltags defaults to this if not set (the image.w * 0.5)
@@ -172,60 +172,63 @@ def family_name(tag):
     if(tag.family() == image.ARTOOLKIT):
         return "ARTOOLKIT"
 
+ball_found = False
 flag0 = True
 flag1 = True
 flag2 = True
 flag3 = False
 flag4 = True
 
-
+move(10)
 while(True):
     clock.tick()
     img = sensor.snapshot()
     time.sleep(100)
-    for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
-        if blob.roundness() >  0.1:
-            ball = ball_and_Commands(blob)
-            ball.draw(blob, img)
-        try:
-            ball.distance()
-            ball.ang()
-            ball.counting()
-        except:
-            print("math_error_distance")
-         #print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
-
+    try:
+        for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
+            if blob.roundness() >  0.1:
+                ball = ball_and_Commands(blob)
+                ball.draw(blob, img)
+            try:
+                ball.distance()
+                ball_found = True
+                ball.ang()
+                ball.counting()
+            except:
+                print("math_error_distance")
+             #print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
+    except:
+        ball_found = False
+        rotate(5)
 
         if flag1:
-            rotate((ball.angle))
+           try:
+               rotate(ball.angle)
+           except:
+               print("ball not found")
+           flag1 = False
+           print("done")
+           time.sleep(100)
+           rotate(45)
+           print("rotate_angle2 ", (ball.angle_2))
+           time.sleep(100)
 
-            flag1 = False
-            print("done")
-
-            time.sleep(4000)
-
-
-            rotate(45)
-            print("rotate_angle2 ", (ball.angle_2))
-            time.sleep(4000)
         if flag2:
-            move(50)
-            flag2 = False
-            time.sleep(100)
+           move(50)
+           flag2 = False
+           #message = "{\"type\":\"kick\",\"value\":" + str(2000) + "} \n"
+           time.sleep(100)
         if flag3:
-            rotate((angle ))
-            flag3 = False
-            time.sleep(100)
+           rotate((angle))
+           flag3 = False
+           time.sleep(100)
         if flag4:
-            rotate(-80)
-            flag4 = False
-            time.sleep(100)
-            flag1 = True
-            time.sleep(100)
-            flag2 = True
-
-
-
+           rotate(-90)
+           time.sleep(100)
+           rotate(ball.angle)
+           flag4 = False
+           time.sleep(100)
+           flag2 = True
         #print(message)
 '''
 
