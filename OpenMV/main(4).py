@@ -86,66 +86,24 @@ def move(value):
         message ="{\"type\":\"move\",\"value\":" + str(int(10 * value)) + "} \n"
 
     uart.write(message)
-    time.sleep(abs(int(value * 30)))
+    print("move sleep", abs(int(value * 70)))
+    time.sleep(abs(int(value * 70)))
     print("move ", value)
-    '''
-   uart.write("{\"type\":\"move\",\"value\":" + str(0) + "} \n")
-    time.sleep(200)
-    try:
-        arduino_json = uart.readline().decode()
-        if arduino_json != None:
-            # print(arduino_json)
-            json_data = json.loads(arduino_json)
-            arduino_status = json_data["value"]
-            if int(arduino_status) == -2:
-                # print(arduino_status)
-                time.sleep(50)
-
-            if int(arduino_status) == 0:
-                # uart.write(message)
-                pass
 
 
-        else:
-            json_data = json.loads(arduino_json)
-
-    except:
-        # print('error arduino')
-        time.sleep(50)
-
-    # uart.write(message)'''
+def kick():
+    message ="{\"type\":\"status\",\"value\":7} \n "
+    uart.write(message)
 
 def rotate(value):
 
     if abs(value) <= 180:
         value *= 90 / 100
 
-    '''if value >=90:
-        value -= 0
-
-    elif value >=50:
-        value  -=
-'''
     message = "{\"type\":\"rotate\",\"value\":" + str(int(value) ) + "} \n"
     uart.write(message)
 
-    print("sleep rotate", abs(int(value / 360 *1000 * 3)))
-    time.sleep(abs(int(value / 360 *1000 * 3)))
-    print("rotate: ", value)
-    '''try:
-        arduino_json = uart.readline().decode()
-        if arduino_json != None:
-            # print(arduino_json)
-            json_data = json.loads(arduino_json)
-            arduino_status = json_data["value"]
-            if int(arduino_status) == -2:
-                # print(arduino_status)
-                time.sleep(1000)
-            if int(arduino_status) == 0:
-                uart.write(message)
-    except:
-        # print('error arduino')
-        time.sleep(50)'''
+
 
 def degrees(radians):
     return (180 * radians) / math.pi
@@ -178,58 +136,78 @@ flag1 = True
 flag2 = True
 flag3 = False
 flag4 = True
+fuck5 = True
+flag6 = True
 
-move(10)
+rotate(10)
 while(True):
     clock.tick()
     img = sensor.snapshot()
     time.sleep(100)
-    try:
-        for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
-            if blob.roundness() >  0.1:
-                ball = ball_and_Commands(blob)
-                ball.draw(blob, img)
-            try:
-                ball.distance()
-                ball_found = True
-                ball.ang()
-                ball.counting()
-            except:
-                print("math_error_distance")
+
+
+    for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
+        if blob.roundness() >  0.1:
+            ball = ball_and_Commands(blob)
+            ball.draw(blob, img)
+        try:
+            ball.distance()
+            ball_found = True
+            ball.ang()
+            ball.counting()
+        except:
+            print("math_error_distance")
              #print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
-    except:
+        ''' except:
         ball_found = False
-        rotate(5)
+        rotate(5)'''
 
-        if flag1:
-           try:
-               rotate(ball.angle)
-           except:
-               print("ball not found")
-           flag1 = False
-           print("done")
-           time.sleep(100)
-           rotate(45)
-           print("rotate_angle2 ", (ball.angle_2))
-           time.sleep(100)
-
-        if flag2:
-           move(50)
-           flag2 = False
-           #message = "{\"type\":\"kick\",\"value\":" + str(2000) + "} \n"
-           time.sleep(100)
-        if flag3:
-           rotate((angle))
-           flag3 = False
-           time.sleep(100)
-        if flag4:
-           rotate(-90)
-           time.sleep(100)
+    if flag1:
+       print(1)
+       try:
            rotate(ball.angle)
-           flag4 = False
-           time.sleep(100)
-           flag2 = True
-        #print(message)
+       except:
+           print("ball not found")
+       flag1 = False
+       print("done")
+       time.sleep(100)
+       rotate(45)
+       print("rotate_angle2 ", (ball.angle_2))
+       time.sleep(100)
+
+    if flag2:
+       print(2)
+       move(50)
+       flag2 = False
+
+       time.sleep(100)
+    if flag3:
+       print(3)
+       rotate((angle))
+       flag3 = False
+       time.sleep(100)
+    if flag4:
+       print(4)
+       rotate(-90)
+       time.sleep(100)
+       rotate(ball.angle)
+       flag4 = False
+       time.sleep(100)
+
+
+
+    if flag6:
+        print(6)
+        move(50)
+        flag6 = False
+
+    if fuck5:
+        print(5)
+        kick()
+        fuck5 = False
+
+
+
 '''
 
     try:
@@ -266,3 +244,31 @@ while(True):
         flag3 = False'''
     # move(100)
 print("end")
+
+
+'''
+uart.write("{\"type\":\"move\",\"value\":" + str(0) + "} \n")
+time.sleep(200)
+try:
+    arduino_json = uart.readline().decode()
+    if arduino_json != None:
+        # print(arduino_json)
+        json_data = json.loads(arduino_json)
+        arduino_status = json_data["value"]
+        if int(arduino_status) == -2:
+            # print(arduino_status)
+            time.sleep(50)
+
+        if int(arduino_status) == 0:
+            # uart.write(message)
+            pass
+
+
+    else:
+        json_data = json.loads(arduino_json)
+
+except:
+    # print('error arduino')
+    time.sleep(50)
+
+# uart.write(message)'''

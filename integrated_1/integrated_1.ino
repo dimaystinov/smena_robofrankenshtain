@@ -433,16 +433,6 @@ void setupKicker(){
   digitalWrite(PORT_KICK,LOW);
 }
 
-unsigned long prevKick=0;
-void kick(){
-  if(millis()-prevKick>500){
-    digitalWrite(PORT_KICK,HIGH);
-    delay(300);
-    digitalWrite(PORT_KICK,LOW);
-    prevKick=millis();
-  }
-}
-
 /*************************************************************************************************
  * speed control
  */
@@ -591,11 +581,6 @@ void loop(){
           case 'r':
             rotateDeg(inCmd.getValue());
             break;
-          case 's':
-            if (inCmd.getValue() == 7){
-              kick();
-              break;
-            }
         }
       }
     }
