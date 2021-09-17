@@ -187,7 +187,7 @@ void startTask(int _ticks1, int _ticks2){
       }
     }
     if(_ticks2>0) {
-      targSpeed2=SPEED_MOVE;
+      targSpeed2=SPEED_MOVE * 1.1;
     }
     else {
       if(_ticks2<0) {
@@ -248,7 +248,7 @@ void checkTask(){
 
 #define BRAKING_DISTANCES_ROTATE_R 10 //тормозной путь правого колеса при рекомендованной скорости (вращение)
 #define BRAKING_DISTANCES_ROTATE_L 10 //тормозной путь левого колеса при рекомендованной скорости (вращение)
- 
+
 void moveMM(int _distance){
   //считаем число оборотов для требуемого пути, умножаем на передаточное число и число тиков на оборот вала
   int ticksR = round(((float)_distance/(PI*WHEEL_DIAMETER))*TICKS_PER_ROTATION*GEAR_RATIO);
@@ -353,7 +353,7 @@ void testDrive(){
 /**************************************************************************************
  * interrupts / encoders
  */
- 
+
 
 #define PIN_ENC_2 18
 #define PIN_ENC_2_DIR 32
@@ -433,6 +433,16 @@ void setupKicker(){
   digitalWrite(PORT_KICK,LOW);
 }
 
+unsigned long prevKick=0;
+void kick(){
+  if(millis()-prevKick>500){
+    digitalWrite(PORT_KICK,HIGH);
+    delay(300);
+    digitalWrite(PORT_KICK,LOW);
+    prevKick=millis();
+  }
+}
+
 /*************************************************************************************************
  * speed control
  */
@@ -501,7 +511,7 @@ void calcSpeed(){
 
   prevCalcTime=millis();
 }
- 
+
 /*************************************************************************************************
  * trace info
  */
@@ -531,10 +541,10 @@ void trace(){
   Serial.print(doneTicks2);
   Serial.print("\n"); 
 #endif
-  
+
 }
 
- 
+
 /*************************************************************************************************
  * main loop
  */
@@ -581,6 +591,11 @@ void loop(){
           case 'r':
             rotateDeg(inCmd.getValue());
             break;
+          case 's':
+            if (inCmd.getValue() == 7){
+              kick();
+              break;
+            }
         }
       }
     }
