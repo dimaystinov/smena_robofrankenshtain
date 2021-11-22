@@ -206,9 +206,10 @@ sensor.set_auto_gain(False)
 sensor.set_auto_whitebal(False)
 clock = time.clock()
 
-#коэффицент размера мяча и расстояния от мяча до центральной линии
-K = 818
-b = 30
+#коэффицент размера мяча, расстояния от мяча до центральной линии и отступ до мяча
+k_ball_area = 818
+b = 50
+b1 = 20
 
 class ball_and_Commands:
     def __init__(self, blob):
@@ -218,8 +219,8 @@ class ball_and_Commands:
         self.length_2 = 0
         self.angle_2 = 0
     def distance(self):
-        Lm = (self.blob[2]+self.blob[3])/2
-        length = K/Lm
+        Lm = (self.blob.w()+self.blob.h())/2
+        length = k_ball_area/Lm
         self.length = int(math.sqrt(length*length-361))
     def ang(self):
         angle = -((blob.cx()-60)*30/60)
@@ -228,7 +229,7 @@ class ball_and_Commands:
         c = self.length
         a = math.sqrt(c*c - b*b)
         beta = math.asin(b / c)
-        b_2 = b - 7
+        b_2 = b - b1
         c_2 = math.sqrt(a*a + b_2 * b_2)
         beta_2 = math.asin(b_2 / c_2)
         angle_2 = beta - beta_2
@@ -282,6 +283,7 @@ ball_not_detected = True
 flag1 = True
 flag2 = True
 flag3 = True
+flag_4 = True
 
 while(True):
     clock.tick()
@@ -289,6 +291,7 @@ while(True):
 
 
     img = sensor.snapshot()
+    #ищем мяч
     while(ball_not_detected):
         img = sensor.snapshot()
         blue_led.on()
@@ -299,6 +302,7 @@ while(True):
             ball_not_detected = False
             break
     blue_led.off()
+    #доворачиваемся до мяча
     for blob in img.find_blobs(thresholds, pixels_threshold=10, area_threshold=10):
         ball = ball_and_Commands(blob)
         ball.draw(blob, img)
@@ -307,15 +311,19 @@ while(True):
         except:
             print("math_error_distance")
         ball.ang()
+        try:
+            ball.counting()
+        except:
+            print("math_error_counting2")
         #print("length = ", ball.length, "angle = ", ball.angle, "angle 2 = ", ball.angle_2, "length2 = ", ball.length_2)
         if flag1:
-            rotate(-(ball.angle))
-            print(ball.angle)
+            rotate(-(ball.angle_2))
+            print(ball.angle_2)
             flag1 = False
         if flag2:
-            move(ball.length / 2)
+            move(ball.length_2)
             flag2 = False
-    try:
+    """try:
         red_led.off()
         for tag in img.find_apriltags(families=tag_families, fx=f_x, fy=f_y, cx=c_x, cy=c_y):
             img.draw_rectangle(tag.rect(), color = (255, 255, 0))
@@ -327,11 +335,10 @@ while(True):
             #print("Tx: %f, Ty %f, Tz %f, Rx %f, Ry %f, Rz %f" % print_args_2)
     except:
         red_led.on()
-        print("framesize_error")
+        print("framesize_error")"""
     if flag3:
-        rotate(1)
-        move(10)
+        rotate(ball.angle_2)
+        move(20)
         flag3 = False
-    move(100)
 print("end")
 '''
